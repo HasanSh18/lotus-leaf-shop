@@ -19,17 +19,33 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Security middleware
+/* ---------- SECURITY MIDDLEWARE ---------- */
+
 app.use(helmet());
 app.use(xss());
+
+// body parser
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// CORS
-app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
-  credentials: true
-}));
+// CORS – منسمح للـ localhost + الدومين تبعك من الـ .env
+const allowedOrigins = [
+  process.env.CLIENT_URL,      // ex: https://lotus-leaf.com أو https://lotus-leaf-shop.vercel.app
+  'http://localhost:3000',
+  'http://localhost:5173'
+].filter(Boolean);
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error('Not allowed by CORS'));
+    },
+    credentials: true,
+  })
+);
 
 // Rate limiting (basic)
 const limiter = rateLimit({
@@ -40,13 +56,19 @@ app.use('/api', limiter);
 
 app.use(morgan('dev'));
 
-// Mongo connection
-const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/lotus_leaf_shop';
-mongoose.connect(mongoUri)
+/* ---------- MONGODB CONNECTION ---------- */
+
+const mongoUri =
+  process.env.MONGO_URI || 'mongodb://localhost:27017/lotus_leaf_shop';
+
+mongoose
+  .connect(mongoUri)
   .then(() => console.log('MongoDB connected'))
   .catch((err) => console.error('MongoDB connection error', err));
 
-// Routes
+/* ---------- ROUTES ---------- */
+
+// health check
 app.get('/', (req, res) => {
   res.json({ message: 'Lotus Leaf API running' });
 });
@@ -54,6 +76,8 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
+
+/* ---------- START SERVER ---------- */
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
