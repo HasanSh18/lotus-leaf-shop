@@ -30,14 +30,18 @@ app.use(express.urlencoded({ extended: true }));
 
 // CORS – منسمح للـ localhost + الدومين تبعك من الـ .env
 const allowedOrigins = [
-  process.env.CLIENT_URL,      // ex: https://lotus-leaf.com أو https://lotus-leaf-shop.vercel.app
+  'https://lotus-leaf.com',
+  'https://www.lotus-leaf.com',
+  'https://lotus-leaf-shop.vercel.app', // الدومين تبع Vercel كمان، احتياطاً
+  process.env.CLIENT_URL,               // إذا بكون مضبوط صح بالـ env
   'http://localhost:3000',
-  'http://localhost:5173'
+  'http://localhost:5173',
 ].filter(Boolean);
 
 app.use(
   cors({
     origin: (origin, callback) => {
+       console.log('Incoming origin:', origin);
       if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
