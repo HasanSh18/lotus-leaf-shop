@@ -13,7 +13,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 dotenv.config();
-
+console.log('GOOGLE_CLIENT_ID (backend):', process.env.GOOGLE_CLIENT_ID);
 const app = express();
 
 const __filename = fileURLToPath(import.meta.url);

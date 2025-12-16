@@ -1471,6 +1471,13 @@ position: absolute;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
   overflow: hidden;
 }
+.shop-spinner-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+  /* نص ارتفاع الشاشة تقريباً */
+}
 
 .admin-card .card-header {
   background: rgba(0, 0, 0, 0.15);

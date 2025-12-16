@@ -24,7 +24,7 @@ const LoginPage = () => {
     setError('');
     try {
       const res = await api.post('/auth/login', form);
-      // 👇 مهم: backend لازم يرجّع { token, user }
+      // backend لازم يرجّع { token, user }
       login(res.data);
       navigate('/');
     } catch (err) {
@@ -43,18 +43,48 @@ const LoginPage = () => {
   };
 
   useEffect(() => {
-    /* global google */
-    if (!window.google || !clientId) return;
+    if (!clientId) {
+      console.warn('REACT_APP_GOOGLE_CLIENT_ID is missing');
+      return;
+    }
 
-    window.google.accounts.id.initialize({
-      client_id: clientId,
-      callback: handleGoogleResponse,
-    });
+    const initializeGoogle = () => {
+      /* global google */
+      if (!window.google || !window.google.accounts) return;
 
-    window.google.accounts.id.renderButton(
-      document.getElementById('googleSignInDiv'),
-      { theme: 'outline', size: 'large', text: 'continue_with' }
-    );
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        callback: handleGoogleResponse,
+      });
+
+      window.google.accounts.id.renderButton(
+        document.getElementById('googleSignInDiv'),
+        {
+          theme: 'outline',
+          size: 'large',
+          text: 'continue_with',
+        }
+      );
+    };
+
+    // لو السكريبت محمّل أصلاً (مثلاً من صفحة تانية)
+    if (window.google && window.google.accounts) {
+      initializeGoogle();
+      return;
+    }
+
+    // غير هيك: نزّل السكريبت ديناميكياً
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.onload = initializeGoogle;
+    document.body.appendChild(script);
+
+    // cleanup (اختياري)
+    return () => {
+      // ما في cleanup إجباري هون، بس منتركها لو حبّينا نضيف لاحقاً
+    };
   }, [clientId]);
 
   return (

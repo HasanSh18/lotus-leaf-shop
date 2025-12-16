@@ -253,11 +253,15 @@ const ShopPage = () => {
         />
       </div>
 
-      {loading && <Spinner animation="border" />}
-      {error && <Alert variant="danger">{error}</Alert>}
+     <div id="shop-products-list">
+        {loading && (
+          <div className="shop-spinner-wrapper">
+            <Spinner animation="border" />
+          </div>
+        )}
 
-      {/* products list */}
-      <div id="shop-products-list">
+        {error && <Alert variant="danger">{error}</Alert>}
+
         <Row className="g-4">
           {products.map((p) => (
             <Col xs={6} md={4} key={p._id}>
@@ -268,7 +272,8 @@ const ShopPage = () => {
 
         {!loading && !products.length && <p>No products found.</p>}
       </div>
-    </div>
+      </div>
+    
   ); 
 };
 
