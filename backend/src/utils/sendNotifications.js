@@ -3,12 +3,14 @@ import axios from 'axios';
 
 // 🟢 Helper لإرسال إيميل عبر Resend
 async function sendEmailViaResend({ to, subject, text }) {
-  if (!process.env.RESEND_API_KEY) {
-    console.log('RESEND_API_KEY not set, skipping email.');
+  const from = process.env.EMAIL_FROM;
+
+  console.log('Resend FROM value =', JSON.stringify(from));
+
+  if (!process.env.RESEND_API_KEY || !from) {
+    console.log('RESEND_API_KEY or EMAIL_FROM not set, skipping email.');
     return;
   }
-
-  const from = process.env.EMAIL_FROM || 'Lotus Leaf <no-reply@example.com>';
 
   try {
     const res = await axios.post(
