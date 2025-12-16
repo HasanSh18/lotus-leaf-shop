@@ -1,37 +1,55 @@
-import nodemailer from 'nodemailer';
+// src/utils/sendNotifications.js
+import axios from 'axios';
 
-// 📨 1) Email لما ينعمل Order جديد
-export const sendOrderEmail = async (order) => {
-  if (!process.env.EMAIL_USER || !process.env.ADMIN_EMAIL) {
-    console.log('Email env vars not set, skipping email sending.');
+// 🟢 Helper لإرسال إيميل عبر Resend
+async function sendEmailViaResend({ to, subject, text }) {
+  if (!process.env.RESEND_API_KEY) {
+    console.log('RESEND_API_KEY not set, skipping email.');
     return;
   }
 
-  console.log('EMAIL_USER =', process.env.EMAIL_USER);
-  console.log('EMAIL_PASS length =', process.env.EMAIL_PASS?.length);
+  const from = process.env.EMAIL_FROM || 'Lotus Leaf <no-reply@example.com>';
 
-  const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: Number(process.env.EMAIL_PORT) || 587,
-    secure: false,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
+  try {
+    const res = await axios.post(
+      'https://api.resend.com/emails',
+      {
+        from,
+        to,
+        subject,
+        text,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    console.log('✅ Email sent via Resend:', res.data?.id || '');
+  } catch (err) {
+    console.error(
+      '❌ Failed to send email via Resend:',
+      err.response?.data || err.message
+    );
+  }
+}
+
+// 📨 1) Email لما ينعمل Order جديد
+export const sendOrderEmail = async (order) => {
+  if (!order) return;
 
   const itemsList = order.items
     .map(
       (item) =>
-        `- ${item.name} (${item.color}/${item.size}) x ${item.quantity} = $${item.price * item.quantity}`
+        `- ${item.name} (${item.color}/${item.size}) x ${item.quantity} = $${
+          item.price * item.quantity
+        }`
     )
     .join('\n');
 
-  const mailOptions = {
-    from: `"Lotus Leaf Shop" <${process.env.EMAIL_USER}>`,
-    to: process.env.ADMIN_EMAIL,
-    subject: `New order from ${order.shippingAddress.fullName}`,
-    text: `
+  const text = `
 New order placed:
 
 Customer: ${order.shippingAddress.fullName}
@@ -47,19 +65,16 @@ Payment Method: ${order.paymentMethod}
 Status: ${order.status}
 
 Order ID: ${order._id}
-    `,
-  };
+  `;
 
-  try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log('✅ Order email sent:', info.messageId);
-  } catch (err) {
-    console.error('❌ Failed to send order email:', err.message);
-    // ما منرمي error مشان ما يوقع الorder
-  }
+  await sendEmailViaResend({
+    to: process.env.ADMIN_EMAIL,
+    subject: `New order from ${order.shippingAddress.fullName}`,
+    text,
+  });
 };
 
-// 🟢 2) WhatsApp link للـ order
+// 🟢 2) WhatsApp link للـ order (متل ما هو)
 export const buildWhatsAppNotificationUrl = (order) => {
   const baseUrl =
     process.env.WHATSAPP_API_URL || 'https://api.whatsapp.com/send';
@@ -76,37 +91,9 @@ export const buildWhatsAppNotificationUrl = (order) => {
 
 // 🔐 3) Email لكود Reset Password
 export const sendPasswordResetEmail = async (user, code) => {
-  console.log('*** sendPasswordResetEmail called for', user.email);
+  if (!user?.email) return;
 
-  // اطبع قيم الـ env كرمال نتأكد إنهن واصلين على Render
-  console.log('EMAIL_USER =', process.env.EMAIL_USER);
-  console.log('EMAIL_HOST =', process.env.EMAIL_HOST);
-  console.log('EMAIL_PORT =', process.env.EMAIL_PORT);
-  console.log('EMAIL_PASS length =', process.env.EMAIL_PASS ? process.env.EMAIL_PASS.length : 0);
-
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.log('Email config not set, skipping reset email.');
-    // خليها ترمي error هلّق كرمال يبين على الـ frontend
-    throw new Error('Email config not set on server');
-  }
-
-  const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: Number(process.env.EMAIL_PORT) || 587,
-    secure: false,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-    logger: true,   // debug زيادة
-    debug: true,
-  });
-
-  const mailOptions = {
-    from: `"Lotus Leaf Shop" <${process.env.EMAIL_USER}>`,
-    to: user.email,
-    subject: 'Reset your Lotus Leaf password',
-    text: `
+  const text = `
 You requested to reset your Lotus Leaf account password.
 
 Your reset code is: ${code}
@@ -114,15 +101,11 @@ Your reset code is: ${code}
 This code will expire in 15 minutes.
 
 If you did not request this, you can ignore this email.
-    `,
-  };
+  `;
 
-  try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log('✅ Reset password email SENT to', user.email, 'messageId:', info.messageId);
-  } catch (err) {
-    console.error('❌ Failed to send reset email:', err);
-    // كمان ارمي error كرمال يطلع 500 وما نضل نفكر إنو كل شي تمام
-    throw err;
-  }
+  await sendEmailViaResend({
+    to: user.email,
+    subject: 'Reset your Lotus Leaf password',
+    text,
+  });
 };
