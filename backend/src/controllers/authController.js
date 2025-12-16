@@ -100,16 +100,16 @@ export const forgotPassword = async (req, res) => {
 
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     user.resetPasswordCode = code;
-    user.resetPasswordExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+    user.resetPasswordExpires = new Date(Date.now() + 15 * 60 * 1000);
     await user.save();
 
     await sendPasswordResetEmail(user, code);
-    console.log('RESET CODE for', user.email, 'is:', code);
 
+    console.log('RESET CODE for', user.email, 'is:', code);
     res.json({ message: 'If that email exists, a reset code was sent.' });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    console.error('forgotPassword error:', err);
+    res.status(500).json({ message: 'Failed to send reset email', error: err.message });
   }
 };
 

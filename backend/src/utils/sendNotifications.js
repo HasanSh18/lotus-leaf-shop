@@ -76,9 +76,18 @@ export const buildWhatsAppNotificationUrl = (order) => {
 
 // 🔐 3) Email لكود Reset Password
 export const sendPasswordResetEmail = async (user, code) => {
+  console.log('*** sendPasswordResetEmail called for', user.email);
+
+  // اطبع قيم الـ env كرمال نتأكد إنهن واصلين على Render
+  console.log('EMAIL_USER =', process.env.EMAIL_USER);
+  console.log('EMAIL_HOST =', process.env.EMAIL_HOST);
+  console.log('EMAIL_PORT =', process.env.EMAIL_PORT);
+  console.log('EMAIL_PASS length =', process.env.EMAIL_PASS ? process.env.EMAIL_PASS.length : 0);
+
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
     console.log('Email config not set, skipping reset email.');
-    return;
+    // خليها ترمي error هلّق كرمال يبين على الـ frontend
+    throw new Error('Email config not set on server');
   }
 
   const transporter = nodemailer.createTransport({
@@ -89,6 +98,8 @@ export const sendPasswordResetEmail = async (user, code) => {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
+    logger: true,   // debug زيادة
+    debug: true,
   });
 
   const mailOptions = {
@@ -107,9 +118,11 @@ If you did not request this, you can ignore this email.
   };
 
   try {
-    await transporter.sendMail(mailOptions);
-    console.log('Reset password email sent to', user.email);
+    const info = await transporter.sendMail(mailOptions);
+    console.log('✅ Reset password email SENT to', user.email, 'messageId:', info.messageId);
   } catch (err) {
-    console.error('Failed to send reset email:', err.message);
+    console.error('❌ Failed to send reset email:', err);
+    // كمان ارمي error كرمال يطلع 500 وما نضل نفكر إنو كل شي تمام
+    throw err;
   }
 };
