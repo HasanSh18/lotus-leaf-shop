@@ -143,7 +143,7 @@ const ProductPage = () => {
     <div className="product-page">
       <Row className="g-5 product-page-inner justify-content-center">
         {/* الصور – نفس الديزاين القديم  */}
-        <Col lg={7} md={7} className="d-flex justify-content-center">
+        <Col lg={7} md={7} className="product-images-col d-flex justify-content-center">
           <div className="product-images-card">
             <div className="product-thumbs-column">
               {images.map((img, idx) => (
