@@ -2709,9 +2709,3 @@ font-weight: 600;
   border-color: rgba(244, 224, 163, 0.9);
 }
 /* ProductPage – عدّلنا عرض عمود الصور على الشاشات الكبيرة */
-@media (min-width: 992px) {
-  .product-page-inner .product-images-col {
-    flex: 0 0 46.333333%;
-    max-width: 46.333333%;
-  }
-}
