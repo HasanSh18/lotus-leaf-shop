@@ -11,7 +11,56 @@ const router = express.Router();
  */
 router.get('/', async (req, res) => {
   try {
-    const products = await Product.find().sort({ createdAt: -1 });
+    const { q, gender, category, color, size, minPrice, maxPrice } = req.query;
+
+    const filter = {};
+
+    // ====== GENDER ======
+    // Men -> Men + Unisex
+    // Women -> Women + Unisex
+    // Unisex -> بس Unisex
+    if (gender && gender !== '' && gender !== 'All') {
+      if (gender === 'Men') {
+        filter.gender = { $in: ['Men', 'Unisex'] };
+      } else if (gender === 'Women') {
+        filter.gender = { $in: ['Women', 'Unisex'] };
+      } else {
+        // مثلاً Unisex أو أي gender تاني
+        filter.gender = gender;
+      }
+    }
+
+    // ====== CATEGORY ======
+    // منستعمل regex ليطابق أي category فيها هالكلمة
+    if (category && category !== '' && category !== 'All') {
+      const escapedCategory = category.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      filter.category = new RegExp(escapedCategory, 'i'); // contains, case-insensitive
+    }
+
+    // ====== COLOR ======
+    if (color && color !== '' && color !== 'All') {
+      filter.colors = color;     // عندك array colors فهالكلام بيمشي
+    }
+
+    // ====== SIZE ======
+    if (size && size !== '' && size !== 'All') {
+      filter.sizes = size;
+    }
+
+    // ====== PRICE RANGE ======
+    if (minPrice || maxPrice) {
+      filter.price = {};
+      if (minPrice) filter.price.$gte = Number(minPrice);
+      if (maxPrice) filter.price.$lte = Number(maxPrice);
+    }
+
+    // ====== SEARCH (name / description) ======
+    if (q && q.trim() !== '') {
+      const regex = new RegExp(q.trim(), 'i');
+      filter.$or = [{ name: regex }, { description: regex }];
+    }
+
+    const products = await Product.find(filter).sort({ createdAt: -1 });
     res.json(products);
   } catch (err) {
     console.error('GET /products error:', err);
