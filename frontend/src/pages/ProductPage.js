@@ -107,7 +107,9 @@ const ProductPage = () => {
   }, [color, size, effectiveMax, product?._id]);
 
   // 4) early returns
-  if (loading) return <Spinner animation="border" />;
+  if (loading) return   <div className="shop-spinner-wrapper">
+              <Spinner animation="border" />
+            </div>;
   if (error) return <Alert variant="danger">{error}</Alert>;
   if (!product) return <p>Not found</p>;
 
