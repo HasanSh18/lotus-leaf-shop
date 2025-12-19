@@ -2715,3 +2715,7 @@ font-weight: 600;
     font-size: 20px !important;
   }
 }
+.variant-availability strong {
+  color: #f4e0a3;
+  /* كمان الـ color نفسه للـ <strong> */
+}

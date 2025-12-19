@@ -221,6 +221,25 @@ const ProductPage = () => {
                 ))}
               </Form.Select>
             </Form.Group>
+            {Array.isArray(product.variants) &&
+  product.variants.length > 0 &&
+  color && (
+    <div className="mb-3 small variant-availability">
+      <div>
+        Availability for color <strong>{color}</strong>:
+      </div>
+      <ul className="list-unstyled mb-1">
+        {product.variants
+          .filter((v) => v.color === color)
+          .map((v) => (
+            <li key={`${v.color}-${v.size}`}>
+              {v.size}:{" "}
+              {v.stock > 0 ? `${v.stock} in stock` : "Sold out"}
+            </li>
+          ))}
+      </ul>
+    </div>
+  )}
 
             {/* Quantity – نفس الشكل، بس منعطّلها إذا الـ variant خلص */}
             <Form.Group className="mb-3">
