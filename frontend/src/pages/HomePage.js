@@ -31,7 +31,7 @@ const HomePage = () => {
           <Col md={6}>
             <Link to="/shop/men" className="category-tile">
               {/* صورة الرجال من public/men.jpeg */}
-              <img src="/men.jpeg" alt="Shop Men" />
+              <img src="/Shopmen.jpeg" alt="Shop Men" />
               <div className="tile-overlay">
                 <span className="tile-subtitle">FOR HIM</span>
                 <span className="tile-title">SHOP MEN</span>
@@ -45,7 +45,7 @@ const HomePage = () => {
           <Col md={6}>
             <Link to="/shop/women" className="category-tile">
               {/* صورة النساء من public/Women.jpeg */}
-              <img src="/Women.jpeg" alt="Shop Women" />
+              <img src="/Shopwomen.jpeg" alt="Shop Women" />
               <div className="tile-overlay">
                 <span className="tile-subtitle">FOR HER</span>
                 <span className="tile-title">SHOP WOMEN</span>
@@ -70,7 +70,7 @@ const HomePage = () => {
             <Col xs={12} sm={6} lg={4} className="mb-3">
               <div className="popular-card">
                 {/* hoodie image */}
-                <img src="/hoodies.jpeg" alt="Unisex hoodies" />
+                <img src="/Hoodie.jpeg" alt="Unisex hoodies" />
                 <div className="popular-card-body">
                   <h6 className="mb-1">Hoodie (Unisex)</h6>
                   <Button
@@ -94,7 +94,7 @@ const HomePage = () => {
             <Col xs={12} sm={6} lg={4} className="mb-3">
               <div className="popular-card">
                 {/* T-shirt image */}
-                <img src="/Tshirt.jpeg" alt="Oversized T-shirt (Unisex)" />
+                <img src="/Oversized.jpeg" alt="Oversized T-shirt (Unisex)" />
                 <div className="popular-card-body">
                   <h6 className="mb-1">Oversized T-shirt (Unisex)</h6>
                   <Button
@@ -117,7 +117,7 @@ const HomePage = () => {
             {/* 3 – Sweater (Unisex) – استعملنا نفس صورة الـ hoodies لعدم وجود صورة خاصة */}
             <Col xs={12} sm={6} lg={4} className="mb-3">
               <div className="popular-card">
-                <img src="/hoodies.jpeg" alt="Sweater (Unisex)" />
+                <img src="/Sweater.jpeg" alt="Sweater (Unisex)" />
                 <div className="popular-card-body">
                   <h6 className="mb-1">Sweater (Unisex)</h6>
                   <Button
@@ -141,7 +141,7 @@ const HomePage = () => {
             <Col xs={12} sm={6} lg={4} className="mb-3">
               <div className="popular-card">
                 <img
-                  src="/Sweatpantsmen.jpeg"
+                  src="/SweatpantsMen.jpeg"
                   alt="Sweatpants (Men)"
                 />
                 <div className="popular-card-body">
@@ -167,7 +167,7 @@ const HomePage = () => {
             <Col xs={12} sm={6} lg={4} className="mb-3">
               <div className="popular-card">
                 <img
-                  src="/womenpants.jpeg"
+                  src="/Sweatpantswomen.jpeg"
                   alt="Sweatpants (Women)"
                 />
                 <div className="popular-card-body">
