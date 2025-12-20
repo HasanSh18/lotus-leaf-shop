@@ -141,7 +141,7 @@ const HomePage = () => {
             <Col xs={12} sm={6} lg={4} className="mb-3">
               <div className="popular-card">
                 <img
-                  src="/SweatpantsMen.jpeg"
+                  src="/sweatpants-men.jpeg"
                   alt="Sweatpants (Men)"
                 />
                 <div className="popular-card-body">
