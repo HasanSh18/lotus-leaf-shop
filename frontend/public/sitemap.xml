@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Main pages -->
+  <url><loc>https://lotus-leaf.com/</loc></url>
+  <url><loc>https://lotus-leaf.com/about</loc></url>
+  <url><loc>https://lotus-leaf.com/contact</loc></url>
+  <url><loc>https://lotus-leaf.com/login</loc></url>
+  <url><loc>https://lotus-leaf.com/register</loc></url>
+  <url><loc>https://lotus-leaf.com/cart</loc></url>
+
+  <!-- Shop root + genders -->
+  <url><loc>https://lotus-leaf.com/shop</loc></url>
+  <url><loc>https://lotus-leaf.com/shop/men</loc></url>
+  <url><loc>https://lotus-leaf.com/shop/women</loc></url>
+  <url><loc>https://lotus-leaf.com/shop/unisex</loc></url>
+
+  <!-- Unisex categories -->
+  <url><loc>https://lotus-leaf.com/shop/unisex/hoodies</loc></url>
+  <url><loc>https://lotus-leaf.com/shop/unisex/oversized</loc></url>
+  <url><loc>https://lotus-leaf.com/shop/unisex/basics</loc></url>
+
+  <!-- Pants men / women -->
+  <url><loc>https://lotus-leaf.com/shop/men/sweatpants</loc></url>
+  <url><loc>https://lotus-leaf.com/shop/women/sweatpants</loc></url>
+
+  <!-- Special offers (all + per gender) -->
+  <url><loc>https://lotus-leaf.com/shop/special-offers</loc></url>
+  <url><loc>https://lotus-leaf.com/shop/men/special-offers</loc></url>
+  <url><loc>https://lotus-leaf.com/shop/women/special-offers</loc></url>
+  <url><loc>https://lotus-leaf.com/shop/unisex/special-offers</loc></url>
+
+</urlset>
