@@ -51,7 +51,7 @@ const ContactPage = () => (
             rel="noreferrer"
             className="contact-value"
           >
-            @lotusleaf
+            @lotusleaf.leb
           </a>
         </div>
       </div>

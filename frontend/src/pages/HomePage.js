@@ -14,7 +14,7 @@ const HomePage = () => {
             <h1 className="mb-3">LOTUS LEAF</h1>
             <p className="mb-4">
               Cozy hoodies, unisex sweater and sweatpants in six signature
-              colors: black, navy blue, burgundy, green, baby blue and aqua.
+              colors: black, navy blue, burgundy, green, baby blue and mint.
               Mix and match or grab our special men/women sets for a better
               price.
             </p>
