@@ -11,7 +11,7 @@ const router = express.Router();
  */
 router.get('/', async (req, res) => {
   try {
-    const { q, gender, category, color, size, minPrice, maxPrice } = req.query;
+    const { q, gender, category, color, discountPrice, size, minPrice, maxPrice } = req.query;
 
     const filter = {};
 
@@ -99,6 +99,7 @@ router.post('/', protect, adminOnly, async (req, res) => {
       category,
       description,
       price,
+      discountPrice,
       colors = [],
       sizes = [],
       images = [],
@@ -119,6 +120,7 @@ router.post('/', protect, adminOnly, async (req, res) => {
       category,
       description,
       price: Number(price),
+      discountPrice: discountPrice !== undefined ? Number(discountPrice) : 0,
       colors,
       sizes,
       images,
@@ -146,6 +148,7 @@ router.put('/:id', protect, adminOnly, async (req, res) => {
       category,
       description,
       price,
+      discountPrice,
       colors = [],
       sizes = [],
       images = [],
@@ -163,7 +166,10 @@ router.put('/:id', protect, adminOnly, async (req, res) => {
     product.gender = gender ?? product.gender;
     product.category = category ?? product.category;
     product.description = description ?? product.description;
-    product.price = price !== undefined ? Number(price) : product.price;
+    product.price = price !== undefined ? Number(price) : product.price
+      if (discountPrice !== undefined) {
+  product.discountPrice = Number(discountPrice) || 0;
+};
     product.colors = colors;
     product.sizes = sizes;
     product.images = images;

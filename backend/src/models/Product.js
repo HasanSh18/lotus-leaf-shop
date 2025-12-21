@@ -34,7 +34,8 @@ const productSchema = new mongoose.Schema(
     },
 
     description: { type: String, required: true },
-
+discountPrice: {
+  type: Number,default: 0,},
     price: { type: Number, required: true },
 
     // colors & sizes (overall)
