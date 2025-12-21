@@ -5,7 +5,7 @@ import { Row, Col, Button, Form, Spinner, Alert } from 'react-bootstrap';
 import api from '../api';
 import { useCart } from '../context/CartContext';
 
-// helper برا الكومبوننت
+// helper برا الكومبوننت لقراءة الـ stock تبع الـ variant
 const getVariantStock = (product, chosenColor, chosenSize) => {
   if (!product) return null;
   if (!Array.isArray(product.variants) || !product.variants.length) return null;
@@ -91,12 +91,12 @@ const ProductPage = () => {
   const isCurrentVariantSoldOut = !effectiveMax || effectiveMax <= 0;
   const maxQty = isCurrentVariantSoldOut ? 0 : effectiveMax;
 
-  // 3) نزبط الكمية حسب الماكس (بس ما منغيّر الديزاين)
+  // 3) نزبط الكمية حسب الماكس
   useEffect(() => {
     const max = effectiveMax;
 
     if (max <= 0) {
-      setQuantity(1); // الـ input أصلاً رح يكون disabled لما يخلص
+      setQuantity(1); // الـ input أصلاً disabled لما يخلص
       return;
     }
 
@@ -107,27 +107,39 @@ const ProductPage = () => {
   }, [color, size, effectiveMax, product?._id]);
 
   // 4) early returns
-  if (loading) return   <div className="shop-spinner-wrapper">
-              <Spinner animation="border" />
-            </div>;
+  if (loading)
+    return (
+      <div className="shop-spinner-wrapper">
+        <Spinner animation="border" />
+      </div>
+    );
+
   if (error) return <Alert variant="danger">{error}</Alert>;
   if (!product) return <p>Not found</p>;
 
+  // الصور
   const fallback = 'https://via.placeholder.com/500x500?text=Lotus+Leaf';
   const images =
     Array.isArray(product.images) && product.images.length > 0
       ? product.images
       : [fallback];
-
   const mainImage = images[activeImageIndex] || fallback;
 
+  // --- خصم السعر ---
+  const hasDiscount =
+    typeof product.discountPrice === 'number' &&
+    product.discountPrice > 0 &&
+    product.discountPrice < product.price;
+
+  const displayPrice = hasDiscount ? product.discountPrice : product.price;
+
+  // add to cart (منستعمل السعر بعد الخصم)
   const handleAddToCart = () => {
     const qty = Number(quantity) || 0;
 
     if (!color || !size || qty < 1) return;
 
     if (isCurrentVariantSoldOut) {
-      // بس حماية إضافية
       alert('This item is sold out for this color/size.');
       return;
     }
@@ -137,15 +149,26 @@ const ProductPage = () => {
       return;
     }
 
-    addToCart(product, { color, size, quantity: qty });
-    
+    const priceForCart = displayPrice;
+
+    addToCart(
+      {
+        ...product,
+        price: priceForCart, // هيدا اللي بيروح عالسلة
+      },
+      { color, size, quantity: qty }
+    );
   };
 
   return (
     <div className="product-page">
       <Row className="g-5 product-page-inner justify-content-center">
-        {/* الصور – نفس الديزاين القديم  */}
-        <Col lg={7} md={7} className="product-images-col d-flex justify-content-center">
+        {/* الصور */}
+        <Col
+          lg={7}
+          md={7}
+          className="product-images-col d-flex justify-content-center"
+        >
           <div className="product-images-card">
             <div className="product-thumbs-column">
               {images.map((img, idx) => (
@@ -169,13 +192,24 @@ const ProductPage = () => {
           </div>
         </Col>
 
-        {/* التفاصيل – كمان نفس JSX القديم تقريباً */}
+        {/* التفاصيل */}
         <Col lg={5} md={5}>
           <p className="product-tag mb-1 text-uppercase">
             {product.gender} · {product.category}
           </p>
           <h2 className="mb-1">{product.name}</h2>
-          <h4 className="mb-3">${product.price}</h4>
+
+          {/* السعر + الخصم */}
+          <div className="mb-3 product-price-wrap">
+            {hasDiscount ? (
+              <>
+                <span className="product-price-old">${product.price}</span>
+                <span className="product-price-new">${displayPrice}</span>
+              </>
+            ) : (
+              <span className="product-price-regular">${product.price}</span>
+            )}
+          </div>
 
           <p className="mb-3">
             {isAllSoldOut ? (
@@ -221,27 +255,29 @@ const ProductPage = () => {
                 ))}
               </Form.Select>
             </Form.Group>
-            {Array.isArray(product.variants) &&
-  product.variants.length > 0 &&
-  color && (
-    <div className="mb-3 small variant-availability">
-      <div>
-        Availability for color <strong>{color}</strong>:
-      </div>
-      <ul className="list-unstyled mb-1">
-        {product.variants
-          .filter((v) => v.color === color)
-          .map((v) => (
-            <li key={`${v.color}-${v.size}`}>
-              {v.size}:{" "}
-              {v.stock > 0 ? `${v.stock} in stock` : "Sold out"}
-            </li>
-          ))}
-      </ul>
-    </div>
-  )}
 
-            {/* Quantity – نفس الشكل، بس منعطّلها إذا الـ variant خلص */}
+            {/* Availability per color */}
+            {Array.isArray(product.variants) &&
+              product.variants.length > 0 &&
+              color && (
+                <div className="mb-3 small variant-availability">
+                  <div>
+                    Availability for color <strong>{color}</strong>:
+                  </div>
+                  <ul className="list-unstyled mb-1">
+                    {product.variants
+                      .filter((v) => v.color === color)
+                      .map((v) => (
+                        <li key={`${v.color}-${v.size}`}>
+                          {v.size}:{' '}
+                          {v.stock > 0 ? `${v.stock} in stock` : 'Sold out'}
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+              )}
+
+            {/* Quantity */}
             <Form.Group className="mb-3">
               <Form.Label>Quantity</Form.Label>
               <Form.Control
@@ -253,22 +289,22 @@ const ProductPage = () => {
                 style={{ maxWidth: 120 }}
                 disabled={isCurrentVariantSoldOut}
               />
-               <Form.Text
-    className="text-muted"
-    style={{
-      display: 'block',                // يخليها تاخد سطر كامل
-      minHeight: '1.2rem',             // ارتفاع ثابت تقريبا
-      visibility:
-        !isCurrentVariantSoldOut && effectiveMax > 0
-          ? 'visible'
-          : 'hidden',                   // مخفي بس بعدو حاجز المساحة
-    }}
-  >
-    Max available: {effectiveMax > 0 ? effectiveMax : ''}
-  </Form.Text>
+              <Form.Text
+                className="text-muted"
+                style={{
+                  display: 'block',
+                  minHeight: '1.2rem',
+                  visibility:
+                    !isCurrentVariantSoldOut && effectiveMax > 0
+                      ? 'visible'
+                      : 'hidden',
+                }}
+              >
+                Max available: {effectiveMax > 0 ? effectiveMax : ''}
+              </Form.Text>
             </Form.Group>
 
-            {/* الزر دايماً "ADD TO CART" بس disabled لو خلص */}
+            {/* زر السلة */}
             <Button
               className="btn-lotus"
               onClick={handleAddToCart}

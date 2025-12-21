@@ -8,16 +8,27 @@ const ProductCard = ({ product }) => {
     product.images?.[0] ||
     'https://via.placeholder.com/400x400?text=Lotus+Leaf';
 
-  const isSoldOut = product.stock <= 0;
+  const isSoldOut =
+    typeof product.stock === 'number' && product.stock <= 0;
 
   const shortDesc =
     (product.description || '').length > 80
       ? product.description.slice(0, 80) + '…'
-      : product.description;
+      : product.description || '';
+
+  // 🔥 نفس منطق ال ProductPage
+  const hasDiscount =
+    typeof product.discountPrice === 'number' &&
+    product.discountPrice > 0 &&
+    product.discountPrice < product.price;
+
+  const displayPrice = hasDiscount
+    ? product.discountPrice
+    : product.price;
 
   return (
     <Card className="product-card h-100 position-relative">
-      {/* Sold out badge */}
+      {/* Badge أعلى الصورة لو Sold out */}
       {isSoldOut && (
         <Badge
           bg="danger"
@@ -28,28 +39,41 @@ const ProductCard = ({ product }) => {
         </Badge>
       )}
 
-      {/* 👇 image wrapper so the full picture appears */}
       <Link to={`/product/${product._id}`}>
-        <div className="product-card-img-wrap">
-          <Card.Img variant="top" src={firstImage} alt={product.name} />
-        </div>
+        <Card.Img variant="top" src={firstImage} alt={product.name} />
       </Link>
 
-      {/* Body */}
+      {/* body flex column */}
       <Card.Body className="d-flex flex-column">
         <div className="d-flex justify-content-between align-items-center mb-2">
           <div className="product-tag">
             {product.gender} · {product.category}
           </div>
-          <div className="product-tag">${product.price}</div>
+
+          {/* 👇 هون منعرض السعر مع الديسكاونت لو موجود */}
+          <div className="product-price-wrap">
+            {hasDiscount ? (
+              <>
+                <span className="product-price-old">${product.price}</span>
+                <span className="product-price-new">${displayPrice}</span>
+              </>
+            ) : (
+              <span className="product-price-regular">
+                ${product.price}
+              </span>
+            )}
+          </div>
         </div>
 
         <Card.Title className="mb-2">{product.name}</Card.Title>
 
         {shortDesc && (
-          <Card.Text className="small text-muted">{shortDesc}</Card.Text>
+          <Card.Text className="small text-muted">
+            {shortDesc}
+          </Card.Text>
         )}
 
+        {/* حالة الستوك */}
         <div className="small mb-2">
           {isSoldOut ? (
             <span className="text-danger">Sold out</span>
@@ -60,6 +84,7 @@ const ProductCard = ({ product }) => {
           )}
         </div>
 
+        {/* الزر مع mt-auto عشان دايمًا يطلع تحت */}
         <Button
           as={Link}
           to={`/product/${product._id}`}

@@ -2719,3 +2719,23 @@ font-weight: 600;
   color: #f4e0a3;
   /* كمان الـ color نفسه للـ <strong> */
 }
+.product-price-wrap {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.product-price-old {
+  text-decoration: line-through;
+  opacity: 0.6;
+  margin-right: 0.5rem;
+}
+
+.product-price-new {
+  font-weight: 600;
+  color: #f4e0a3;
+  /* nafs l-accent color taba3ak */
+}
+
+.product-price-regular {
+  font-weight: 600;
+}

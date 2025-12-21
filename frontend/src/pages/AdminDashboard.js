@@ -25,6 +25,7 @@ const AdminDashboard = () => {
     category: 'Hoodie unisex',
     description: '',
     price: 0,
+    discountPrice: 0,
     colors: '',
     sizes: '',
     images: '',
@@ -64,6 +65,7 @@ const AdminDashboard = () => {
       gender: 'Unisex',
       category: 'Hoodie unisex',
       description: '',
+      discountPrice: 0,
       price: 0,
       colors: '',
       sizes: '',
@@ -78,94 +80,100 @@ const AdminDashboard = () => {
     setProductForm({ ...productForm, [e.target.name]: e.target.value });
   };
 
-  const handleCreateOrUpdateProduct = async (e) => {
-    e.preventDefault();
-    try {
-      const { variantsText, ...rest } = productForm;
+const handleCreateOrUpdateProduct = async (e) => {
+  e.preventDefault();
+  try {
+    setError('');
 
-      // colors / sizes / images arrays
-      const colorsArray = (rest.colors || '')
-        .split(',')
-        .map((c) => c.trim())
-        .filter(Boolean);
+    // 1) arrays men el inputs
+    const colorsArray = productForm.colors
+      .split(',')
+      .map((c) => c.trim())
+      .filter(Boolean);
 
-      const sizesArray = (rest.sizes || '')
-        .split(',')
-        .map((s) => s.trim())
-        .filter(Boolean);
+    const sizesArray = productForm.sizes
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
 
-      const imagesArray = (rest.images || '')
-        .split(',')
-        .map((i) => i.trim())
-        .filter(Boolean);
+    const imagesArray = productForm.images
+      .split(',')
+      .map((i) => i.trim())
+      .filter(Boolean);
 
-      // 🔥 parse variants من textarea
-      let variants = [];
-      if (variantsText && variantsText.trim().length > 0) {
-        variants = variantsText
-          .split('\n')
-          .map((line) => line.trim())
-          .filter(Boolean)
-          .map((line) => {
-            const [color, size, stockRaw] = line.split(',').map((x) => x.trim());
-            return {
-              color,
-              size,
-              stock: Number(stockRaw) || 0,
-            };
-          })
-          .filter((v) => v.color && v.size);
-      }
-
-      const totalStockFromVariants = variants.length
-        ? variants.reduce((sum, v) => sum + (v.stock || 0), 0)
-        : Number(rest.stock) || 0;
-
-      const body = {
-        ...rest,
-        price: Number(rest.price),
-        stock: totalStockFromVariants,
-        colors: colorsArray,
-        sizes: sizesArray,
-        images: imagesArray,
-        variants,
-      };
-
-      if (editingId) {
-        await api.put(`/products/${editingId}`, body);
-      } else {
-        await api.post('/products', body);
-      }
-
-      resetForm();
-      load();
-    } catch (err) {
-      console.error(err);
-      setError('Could not save product');
+    // 2) variants textarea  => array [{color,size,stock}]
+    let variants = [];
+    if (productForm.variantsText?.trim()) {
+      variants = productForm.variantsText
+        .split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((line) => {
+          const [color, size, stockRaw] = line.split(',').map((x) => x.trim());
+          return {
+            color,
+            size,
+            stock: Number(stockRaw) || 0,
+          };
+        })
+        .filter((v) => v.color && v.size);
     }
-  };
 
-  const handleEditProduct = (p) => {
-    setEditingId(p._id);
-    setProductForm({
-      name: p.name || '',
-      gender: p.gender || 'Unisex',
-      category: p.category || 'Hoodie unisex',
-      description: p.description || '',
-      price: p.price ?? 0,
-      stock: p.stock ?? 0,
-      colors: Array.isArray(p.colors) ? p.colors.join(', ') : '',
-      sizes: Array.isArray(p.sizes) ? p.sizes.join(', ') : '',
-      images: Array.isArray(p.images) ? p.images.join(', ') : '',
-      // 🔥 حوّلنا الـ variants لنص textarea
-      variantsText: Array.isArray(p.variants)
-        ? p.variants
-            .map((v) => `${v.color || ''}, ${v.size || ''}, ${v.stock ?? 0}`)
-            .join('\n')
-        : '',
-    });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+    // 3) stock total (iza fi variants mnjma3on, iza la2 mnest3mel field stock)
+    const totalStockFromVariants = variants.length
+      ? variants.reduce((sum, v) => sum + (v.stock || 0), 0)
+      : Number(productForm.stock) || 0;
+
+    // 4) el body elli ra7 yrou7 3al backend
+    const body = {
+      name: productForm.name.trim(),
+      gender: productForm.gender,
+      category: productForm.category,
+      description: productForm.description,
+      price: Number(productForm.price),
+      discountPrice: Number(productForm.discountPrice) || 0,
+      stock: totalStockFromVariants,
+      colors: colorsArray,
+      sizes: sizesArray,
+      images: imagesArray,
+      variants,
+    };
+
+    if (editingId) {
+      await api.put(`/products/${editingId}`, body);
+    } else {
+      await api.post('/products', body);
+    }
+
+    resetForm();
+    load();
+  } catch (err) {
+    console.error(err);
+    setError('Could not save product');
+  }
+};
+
+const handleEditProduct = (p) => {
+  setEditingId(p._id);
+  setProductForm({
+    name: p.name || '',
+    gender: p.gender || 'Unisex',
+    category: p.category || 'Hoodie unisex',
+    description: p.description || '',
+    price: p.price ?? 0,
+    discountPrice: p.discountPrice ?? 0,
+    stock: p.stock ?? 0,
+    colors: Array.isArray(p.colors) ? p.colors.join(', ') : '',
+    sizes: Array.isArray(p.sizes) ? p.sizes.join(', ') : '',
+    images: Array.isArray(p.images) ? p.images.join(', ') : '',
+    variantsText: Array.isArray(p.variants)
+      ? p.variants
+          .map((v) => `${v.color || ''}, ${v.size || ''}, ${v.stock ?? 0}`)
+          .join('\n')
+      : '',
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
 
   const handleDeleteProduct = async (id) => {
     if (!window.confirm('Are you sure you want to delete this product?')) return;
@@ -301,22 +309,41 @@ const AdminDashboard = () => {
                       </Col>
 
                       {/* Price & Stock (global) */}
-                      <Col md={6}>
-                        <Form.Group className="mb-2">
-                          <Form.Label className="admin-label">
-                            Price (USD)
-                          </Form.Label>
-                          <Form.Control
-                            placeholder="30"
-                            type="number"
-                            min="0"
-                            name="price"
-                            value={productForm.price}
-                            onChange={handleProductChange}
-                          />
-                        </Form.Group>
-                        <Form.Text className="text-muted">Unit price</Form.Text>
-                      </Col>
+                      {/* Price & Stock (global) */}
+<Col md={6}>
+  <Form.Group className="mb-2">
+    <Form.Label className="admin-label">Price (USD)</Form.Label>
+    <Form.Control
+      placeholder="30"
+      type="number"
+      min="0"
+      name="price"
+      value={productForm.price}
+      onChange={handleProductChange}
+    />
+  </Form.Group>
+  <Form.Text className="text-muted">Regular price</Form.Text>
+</Col>
+
+<Col md={6}>
+  <Form.Group className="mb-2">
+    <Form.Label className="admin-label">
+      Discount price (optional)
+    </Form.Label>
+    <Form.Control
+      placeholder="25"
+      type="number"
+      min="0"
+      name="discountPrice"
+      value={productForm.discountPrice}
+      onChange={handleProductChange}
+    />
+  </Form.Group>
+  <Form.Text className="text-muted">
+    Leave 0 if there is no discount
+  </Form.Text>
+</Col>
+
 
                       <Col md={6}>
                         <Form.Group className="mb-2">
