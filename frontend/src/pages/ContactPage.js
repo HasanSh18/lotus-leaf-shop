@@ -89,7 +89,7 @@ const ContactPage = () => (
             rel="noreferrer"
             className="contact-value"
           >
-            Lotus Leaf on Facebook
+            Lotus Leaf
           </a>
         </div>
       </div>
