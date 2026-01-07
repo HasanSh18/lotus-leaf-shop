@@ -1,5 +1,7 @@
+// src/pages/ContactPage.js
 import React from 'react';
 import { FaTiktok } from 'react-icons/fa6';
+import { FaFacebook } from 'react-icons/fa';
 
 const ContactPage = () => (
   <section className="contact-page">
@@ -70,6 +72,24 @@ const ContactPage = () => (
             className="contact-value"
           >
             @lotusleaf.leb
+          </a>
+        </div>
+      </div>
+
+      {/* Facebook */}
+      <div className="contact-row">
+        <div className="contact-icon contact-icon-facebook">
+  <FaFacebook color="#ffffff" size={22} />
+</div>
+        <div className="contact-text">
+          <span className="contact-label">Facebook</span>
+          <a
+            href="https://www.facebook.com/share/1FXxJghbJn/?mibextid=wwXIfr"
+            target="_blank"
+            rel="noreferrer"
+            className="contact-value"
+          >
+            Lotus Leaf on Facebook
           </a>
         </div>
       </div>
