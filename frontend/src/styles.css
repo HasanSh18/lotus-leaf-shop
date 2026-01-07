@@ -2739,3 +2739,9 @@ font-weight: 600;
 .product-price-regular {
   font-weight: 600;
 }
+@media (max-width: 768px) {
+  .product-price-wrap {
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+}
