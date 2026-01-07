@@ -3,6 +3,7 @@ import { Container } from 'react-bootstrap';
 import {
   FaInstagram,
   FaWhatsapp,
+  FaFacebook
 } from 'react-icons/fa';
 import { FaTiktok } from 'react-icons/fa6'; // 👈 NEW
 
@@ -39,15 +40,16 @@ const Footer = () => {
           >
             <FaTiktok />
           </a>
-
-          <a
-            href="https://wa.me/96171659649"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="WhatsApp"
-          >
-            <FaWhatsapp />
-          </a>
+<a
+    href="https://www.facebook.com/share/1FXxJghbJn/?mibextid=wwXIfr"
+    target="_blank"
+    rel="noreferrer"
+    aria-label="Facebook"
+  >
+    <FaFacebook />
+  </a>
+         
+        
         </div>
       </Container>
     </footer>
